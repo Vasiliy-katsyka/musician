@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rise to Stardom: Legacy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        .number-ticker {
+            transition: all 0.3s ease;
+        }
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        /* Removed notification animation for simplicity in debugging NaN */
+        /* .notification {
+            animation: slideIn 0.3s ease-out, fadeOut 0.3s ease-out 3s forwards;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        } */
+        .chart-bar {
+            transition: height 0.5s ease;
+        }
+        .hidden-file-input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+        .avatar-preview, .cover-preview {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #6b7280; /* gray-500 */
+            display: block;
+            margin: 0 auto 1rem; /* Center and add bottom margin */
+            background-color: #4b5563; /* gray-600 for placeholder */
+        }
+        .cover-preview {
+             border-radius: 0.5rem; /* rounded-lg */
+             width: 128px; /* w-32 */
+             height: 128px; /* h-32 */
+        }
+        .custom-file-upload {
+            border: 1px solid #4b5563; /* gray-600 */
+            display: inline-block;
+            padding: 6px 12px;
+            cursor: pointer;
+            background-color: #374151; /* gray-700 */
+            border-radius: 0.375rem; /* rounded-md */
+            transition: background-color 0.2s ease;
+        }
+        .custom-file-upload:hover {
+            background-color: #4b5563; /* gray-600 */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Game Container -->
+    <div class="container mx-auto px-4 py-8" id="gameContainer">
+        <!-- Character Creation Screen -->
+        <div id="characterCreation" class="max-w-4xl mx-auto bg-gray-800 rounded-xl p-8 shadow-2xl">
+            <h1 class="text-4xl font-bold text-center mb-8 text-purple-400">Rise to Stardom: Legacy</h1>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Left Column -->
+                <div>
+                    <h2 class="text-2xl font-semibold mb-4 text-yellow-300">Character Details</h2>
+                    <div class="mb-6"> <label class="block text-gray-300 mb-2">Stage Name</label> <input type="text" id="stageName" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"> </div>
+                    <div class="mb-6"> <label class="block text-gray-300 mb-2">Real Name (Optional)</label> <input type="text" id="realName" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"> </div>
+                    <div class="mb-6"> <label class="block text-gray-300 mb-2">Starting Age</label> <select id="startingAge" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"> <option value="18">18 (Young Talent)</option> <option value="22">22 (Fresh Start)</option> <option value="25">25 (Established Taste)</option> <option value="30">30 (Late Bloomer)</option> </select> </div>
+                    <div class="mb-6"> <label class="block text-gray-300 mb-2">Hometown/Background</label> <select id="hometown" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"> <option value="smallTown">Small Town Dreamer</option> <option value="bigCity">Big City Hustler</option> <option value="suburbs">Suburban Creative</option> <option value="international">International Roots</option> </select> </div>
+                </div>
+                <!-- Right Column -->
+                <div>
+                    <h2 class="text-2xl font-semibold mb-4 text-yellow-300">Musical Identity</h2>
+                    <div class="mb-6"> <label class="block text-gray-300 mb-2">Primary Genre</label> <select id="primaryGenre" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"> <option value="pop">Pop</option> <option value="rock">Rock</option> <option value="hiphop">Hip Hop</option> <option value="electronic">Electronic</option> <option value="r&b">R&B</option> <option value="indie">Indie</option> <option value="country">Country</option> <option value="alternative">Alternative</option> </select> </div>
+                    <div class="mb-6"> <label class="block text-gray-300 mb-2">Secondary Genre (Optional)</label> <select id="secondaryGenre" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"> <option value="none">None</option> <option value="pop">Pop</option> <option value="rock">Rock</option> <option value="hiphop">Hip Hop</option> <option value="electronic">Electronic</option> <option value="r&b">R&B</option> <option value="indie">Indie</option> <option value="country">Country</option> <option value="alternative">Alternative</option> </select> </div>
+                    <div class="mb-6"> <label class="block text-gray-300 mb-2">Starting Style/Aesthetic</label> <select id="startingStyle" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"> <option value="grungy">Grungy</option> <option value="polished">Polished Pop</option> <option value="bohemian">Bohemian</option> <option value="street">Street</option> <option value="glam">Glam</option> <option value="minimalist">Minimalist</option> </select> </div>
+                    <div class="mb-6"> <label class="block text-gray-300 mb-2">Innate Talent</label> <select id="innateTalent" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"> <option value="charisma">Natural Charisma</option> <option value="prodigy">Prodigy</option> <option value="technical">Technical Ear</option> <option value="lyricism">Gifted Lyricist</option> <option value="stage">Stage Presence</option> </select> </div>
+                </div>
+            </div>
+            <!-- Avatar Selection -->
+            <div class="mt-8">
+                <h2 class="text-2xl font-semibold mb-4 text-yellow-300">Visual Identity</h2>
+                <div class="text-center"> <img id="avatarPreview" src="https://via.placeholder.com/100?text=Avatar" alt="Avatar Preview" class="avatar-preview"> <label for="avatarUpload" class="custom-file-upload"> <i class="fas fa-upload mr-2"></i> Upload Avatar </label> <input type="file" id="avatarUpload" accept="image/*" class="hidden-file-input"> <p class="text-xs text-gray-400 mt-2">(Optional: Upload your own image)</p> </div>
+                <p class="text-center my-4 text-gray-500">-- OR Choose Default --</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                    <div class="avatar-option border-2 border-transparent hover:border-purple-500 rounded-lg p-2 cursor-pointer" data-avatar-url="https://randomuser.me/api/portraits/women/1.jpg"> <img src="https://randomuser.me/api/portraits/women/1.jpg" class="w-full rounded-lg"> </div>
+                    <div class="avatar-option border-2 border-transparent hover:border-purple-500 rounded-lg p-2 cursor-pointer" data-avatar-url="https://randomuser.me/api/portraits/men/1.jpg"> <img src="https://randomuser.me/api/portraits/men/1.jpg" class="w-full rounded-lg"> </div>
+                    <div class="avatar-option border-2 border-transparent hover:border-purple-500 rounded-lg p-2 cursor-pointer" data-avatar-url="https://randomuser.me/api/portraits/women/2.jpg"> <img src="https://randomuser.me/api/portraits/women/2.jpg" class="w-full rounded-lg"> </div>
+                    <div class="avatar-option border-2 border-transparent hover:border-purple-500 rounded-lg p-2 cursor-pointer" data-avatar-url="https://randomuser.me/api/portraits/men/2.jpg"> <img src="https://randomuser.me/api/portraits/men/2.jpg" class="w-full rounded-lg"> </div>
+                </div>
+            </div>
+            <div class="mt-12 text-center"> <button id="startGameBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full text-lg transition-all transform hover:scale-105"> Begin Your Musical Journey </button> </div>
+        </div>
+
+        <!-- Main Game Screen (Hidden Initially) -->
+        <div id="mainGame" class="hidden">
+            <!-- Header with Stats -->
+            <div class="bg-gray-800 rounded-xl p-4 mb-6 shadow-lg">
+                <div class="flex flex-wrap items-center justify-between">
+                    <div class="flex items-center space-x-4 mb-4 md:mb-0"> <img id="playerAvatar" src="" class="w-12 h-12 rounded-full border-2 border-purple-500 object-cover"> <div> <h2 id="playerStageName" class="font-bold text-lg"></h2> <p id="playerGenre" class="text-gray-400 text-sm"></p> </div> </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full md:w-auto">
+                        <div class="bg-gray-700 rounded-lg p-3 text-center"> <p class="text-gray-400 text-xs">Subscribers</p> <p id="subscriberCount" class="font-bold text-xl number-ticker">0</p> </div>
+                        <div class="bg-gray-700 rounded-lg p-3 text-center"> <p class="text-gray-400 text-xs">Streams</p> <p id="streamCount" class="font-bold text-xl number-ticker">0</p> </div>
+                        <div class="bg-gray-700 rounded-lg p-3 text-center"> <p class="text-gray-400 text-xs">Income</p> <p id="incomeCount" class="font-bold text-xl number-ticker">$0</p> </div>
+                        <div class="bg-gray-700 rounded-lg p-3 text-center"> <p class="text-gray-400 text-xs">Fame</p> <div class="flex items-center justify-center space-x-1"> <i class="fas fa-star text-yellow-400"></i> <p id="fameLevel" class="font-bold">Unknown</p> </div> </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Main Content Area -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Left Sidebar -->
+                <div class="lg:col-span-1">
+                    <div class="bg-gray-800 rounded-xl p-6 mb-6 shadow-lg">
+                        <h3 class="font-bold text-lg mb-4 text-purple-400">Your Stats</h3>
+                        <div class="space-y-4"> <div> <div class="flex justify-between mb-1"> <span class="text-sm">Vocal Performance</span> <span id="vocalSkillValue" class="text-sm">50</span> </div> <div class="w-full bg-gray-700 rounded-full h-2.5"> <div id="vocalSkillBar" class="bg-blue-500 h-2.5 rounded-full progress-bar" style="width: 50%"></div> </div> </div> <div> <div class="flex justify-between mb-1"> <span class="text-sm">Songwriting</span> <span id="songwritingSkillValue" class="text-sm">50</span> </div> <div class="w-full bg-gray-700 rounded-full h-2.5"> <div id="songwritingSkillBar" class="bg-green-500 h-2.5 rounded-full progress-bar" style="width: 50%"></div> </div> </div> <div> <div class="flex justify-between mb-1"> <span class="text-sm">Production</span> <span id="productionSkillValue" class="text-sm">30</span> </div> <div class="w-full bg-gray-700 rounded-full h-2.5"> <div id="productionSkillBar" class="bg-yellow-500 h-2.5 rounded-full progress-bar" style="width: 30%"></div> </div> </div> <div> <div class="flex justify-between mb-1"> <span class="text-sm">Stage Presence</span> <span id="stageSkillValue" class="text-sm">40</span> </div> <div class="w-full bg-gray-700 rounded-full h-2.5"> <div id="stageSkillBar" class="bg-purple-500 h-2.5 rounded-full progress-bar" style="width: 40%"></div> </div> </div> </div>
+                        <h3 class="font-bold text-lg mt-6 mb-4 text-purple-400">Wellbeing</h3>
+                        <div class="space-y-4"> <div> <div class="flex justify-between mb-1"> <span class="text-sm">Energy</span> <span id="energyValue" class="text-sm">80</span> </div> <div class="w-full bg-gray-700 rounded-full h-2.5"> <div id="energyBar" class="bg-blue-400 h-2.5 rounded-full progress-bar" style="width: 80%"></div> </div> </div> <div> <div class="flex justify-between mb-1"> <span class="text-sm">Mental Health</span> <span id="mentalHealthValue" class="text-sm">70</span> </div> <div class="w-full bg-gray-700 rounded-full h-2.5"> <div id="mentalHealthBar" class="bg-green-400 h-2.5 rounded-full progress-bar" style="width: 70%"></div> </div> </div> <div> <div class="flex justify-between mb-1"> <span class="text-sm">Public Image</span> <span id="publicImageValue" class="text-sm">60</span> </div> <div class="w-full bg-gray-700 rounded-full h-2.5"> <div id="publicImageBar" class="bg-purple-400 h-2.5 rounded-full progress-bar" style="width: 60%"></div> </div> </div> </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-xl p-6 shadow-lg">
+                        <h3 class="font-bold text-lg mb-4 text-purple-400">Quick Actions</h3>
+                        <div class="space-y-3"> <button id="practiceVocalsBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg flex items-center justify-between"> <span>Practice Vocals</span> <i class="fas fa-microphone"></i> </button> <button id="writeSongBtn" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg flex items-center justify-between"> <span>Write Song</span> <i class="fas fa-music"></i> </button> <button id="produceTrackBtn" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-2 px-4 rounded-lg flex items-center justify-between"> <span>Produce Track</span> <i class="fas fa-sliders-h"></i> </button> <button id="restBtn" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg flex items-center justify-between"> <span>Rest</span> <i class="fas fa-bed"></i> </button> </div>
+                    </div>
+                </div>
+                <!-- Main Content -->
+                <div class="lg:col-span-2">
+                    <div class="bg-gray-800 rounded-xl p-6 mb-6 shadow-lg">
+                        <h3 class="font-bold text-lg mb-4 text-purple-400">Studio</h3>
+                        <div id="noProject"> <div class="text-center py-8"> <i class="fas fa-compact-disc text-5xl text-gray-600 mb-4"></i> <p class="text-gray-400">Ready to create some magic?</p> <button id="startProjectBtn" class="mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-full"> Start New Project </button> </div> </div>
+                        <div id="activeProject" class="hidden"> <h4 class="font-semibold text-lg mb-2">Current Project:</h4> <div class="flex items-start space-x-4"> <div class="bg-gray-700 rounded-lg p-2 w-24 h-24 flex items-center justify-center"> <img id="projectCoverPreview" src="https://via.placeholder.com/80?text=Art" alt="Project Cover" class="w-full h-full object-cover rounded-md"> </div> <div class="flex-1"> <h4 id="projectTitle" class="font-bold text-lg">New Song</h4> <p id="projectType" class="text-gray-400 text-sm mb-2">Single</p> <div class="flex space-x-2 mb-3"> <span id="projectStage" class="bg-gray-700 text-xs px-2 py-1 rounded">Writing</span> </div> <div class="w-full bg-gray-700 rounded-full h-2 mb-2"> <div id="projectProgressBar" class="bg-purple-500 h-2 rounded-full progress-bar" style="width: 0%"></div> </div> <p id="projectProgressText" class="text-right text-xs text-gray-400">0% complete</p> </div> </div> <div class="mt-6 grid grid-cols-2 gap-4"> <button id="workOnProjectBtn" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"> Work on Project </button> <button id="cancelProjectBtn" class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg"> Cancel Project </button> </div> </div>
+                    </div>
+                    <div id="catalogueSection" class="bg-gray-800 rounded-xl p-6 mb-6 shadow-lg">
+                        <h3 class="font-bold text-lg mb-4 text-purple-400">Your Catalogue</h3>
+                        <div id="catalogueList" class="space-y-4 max-h-60 overflow-y-auto"> <p class="text-gray-500 italic">No releases yet. Complete your first project!</p> </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-xl p-6 shadow-lg">
+                        <div class="flex justify-between items-center mb-4"> <h3 class="font-bold text-lg text-purple-400">Social Feed</h3> <div class="flex space-x-2"> <button id="postUpdateBtn" class="bg-gray-700 hover:bg-gray-600 text-white text-sm py-1 px-3 rounded-lg"> <i class="fas fa-plus mr-1"></i> Post </button> <button id="refreshFeedBtn" class="bg-gray-700 hover:bg-gray-600 text-white text-sm py-1 px-3 rounded-lg"> <i class="fas fa-sync-alt"></i> </button> </div> </div>
+                        <div id="socialFeed" class="space-y-4 max-h-96 overflow-y-auto"> </div>
+                    </div>
+                </div>
+                <!-- Right Sidebar -->
+                <div class="lg:col-span-1">
+                    <div class="bg-gray-800 rounded-xl p-6 mb-6 shadow-lg">
+                        <div class="flex justify-between items-center mb-4"> <h3 class="font-bold text-lg text-purple-400">Notifications</h3> <button id="clearNotificationsBtn" class="text-gray-400 hover:text-white text-sm"> <i class="fas fa-trash-alt"></i> </button> </div>
+                        <div id="notificationsList" class="space-y-3 max-h-96 overflow-y-auto"> </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-xl p-6 shadow-lg">
+                        <h3 class="font-bold text-lg mb-4 text-purple-400">Upcoming</h3>
+                        <div id="upcomingEvents" class="space-y-4"> </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Creation Modal -->
+        <div id="projectModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-gray-800 rounded-xl p-6 w-full max-w-md">
+                <div class="flex justify-between items-center mb-4"> <h3 class="text-xl font-bold text-purple-400">Start New Project</h3> <button id="closeProjectModalBtn" class="text-gray-400 hover:text-white"> <i class="fas fa-times"></i> </button> </div>
+                <div class="space-y-4">
+                    <div> <label class="block text-gray-300 mb-2">Cover Art (Optional)</label> <div class="flex items-center space-x-4"> <img id="modalCoverPreview" src="https://via.placeholder.com/80?text=Art" alt="Cover Preview" class="w-20 h-20 object-cover rounded-md border border-gray-600 bg-gray-600"> <div> <label for="coverArtUpload" class="custom-file-upload text-sm"> <i class="fas fa-upload mr-1"></i> Upload Image </label> <input type="file" id="coverArtUpload" accept="image/*" class="hidden-file-input"> <p class="text-xs text-gray-400 mt-1">Upload custom cover art.</p> </div> </div> </div>
+                    <div> <label class="block text-gray-300 mb-2">Project Type</label> <select id="projectTypeSelect" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"> <option value="single">Single</option> <option value="ep">EP (3-6 songs)</option> <option value="album" disabled>Album (Coming Soon)</option> </select> </div>
+                    <div> <label class="block text-gray-300 mb-2">Project Title</label> <input type="text" id="projectTitleInput" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="My Amazing Song"> </div>
+                    <div> <label class="block text-gray-300 mb-2">Genre</label> <select id="projectGenreSelect" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"> <option value="primary">Primary Genre</option> <option value="secondary">Secondary Genre</option> <option value="experimental">Experimental</option> </select> </div>
+                    <div> <label class="block text-gray-300 mb-2">Style</label> <select id="projectStyleSelect" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"> <option value="current">Current Style</option> <option value="new">New Direction</option> <option value="collab">Collaborative</option> </select> </div>
+                    <div class="pt-4"> <button id="confirmProjectBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg"> Start Project </button> </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Release Confirmation Modal -->
+        <div id="releaseModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-gray-800 rounded-xl p-6 w-full max-w-2xl">
+                <div class="text-center">
+                    <h3 class="text-2xl font-bold text-purple-400 mb-2">Project Complete!</h3>
+                    <p class="text-gray-300 mb-6">You've finished <span id="completedProjectTitle" class="font-semibold"></span>! Ready to release it to the world and see how it performs?</p>
+                    <div class="bg-gray-700 rounded-lg p-6 mb-6">
+                        <div class="flex justify-center mb-4"> <img id="releaseCoverArt" src="" class="cover-preview bg-gray-600"> </div>
+                        <h4 id="releaseTitle" class="font-bold text-lg"></h4> <p id="releaseType" class="text-gray-400 text-sm mb-4"></p>
+                        <div class="grid grid-cols-3 gap-4 mt-6">
+                            <div class="bg-gray-600 rounded-lg p-3"> <p class="text-gray-400 text-xs">Est. Initial Buzz</p> <p id="initialBuzz" class="font-bold">Calculating...</p> </div>
+                            <div class="bg-gray-600 rounded-lg p-3"> <p class="text-gray-400 text-xs">Est. Potential Reach</p> <p id="potentialReach" class="font-bold">Analyzing...</p> </div>
+                            <div class="bg-gray-600 rounded-lg p-3"> <p class="text-gray-400 text-xs">Est. Industry Interest</p> <p id="industryInterest" class="font-bold">Evaluating...</p> </div>
+                        </div>
+                    </div>
+                    <button id="confirmReleaseBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-full"> Release to the World </button>
+                    <button id="cancelReleaseBtn" class="ml-4 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-full"> Hold Off </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real-Time Stats Panel -->
+        <div id="realTimeStatsPanel" class="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 p-4 shadow-lg z-40 hidden">
+            <div class="container mx-auto">
+                 <h3 class="font-bold text-center text-purple-400 mb-2">Overall Performance</h3>
+                <div class="flex flex-wrap justify-around items-center">
+                   <div class="text-center mx-2 my-1"> <p class="text-xs text-gray-400">Total Streams</p> <p id="rtStreams" class="font-bold number-ticker">0</p> </div>
+                   <div class="text-center mx-2 my-1"> <p class="text-xs text-gray-400">Active Listeners</p> <p id="rtListeners" class="font-bold number-ticker">0</p> </div>
+                   <div class="text-center mx-2 my-1"> <p class="text-xs text-gray-400">Total Subscribers</p> <p id="rtSubscribers" class="font-bold number-ticker">0</p> </div>
+                   <div class="text-center mx-2 my-1"> <p class="text-xs text-gray-400">Total Income</p> <p id="rtIncome" class="font-bold number-ticker">$0</p> </div>
+                   <div class="text-center mx-2 my-1"> <p class="text-xs text-gray-400">Growth Rate</p> <p id="rtGrowthRate" class="font-bold number-ticker">Low</p> </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Constants ---
+        const DEFAULT_AVATAR = 'https://via.placeholder.com/100?text=Avatar';
+        const DEFAULT_COVER_ART = 'https://via.placeholder.com/80?text=Art';
+        const PLACEHOLDER_AVATAR_MALE = 'https://randomuser.me/api/portraits/lego/1.jpg';
+        const PLACEHOLDER_AVATAR_FEMALE = 'https://randomuser.me/api/portraits/lego/5.jpg'; // Use different placeholders
+        const SIMULATION_INTERVAL = 2000; // ms between stat updates
+        const MAX_NOTIFICATIONS = 15;
+        const MAX_SOCIAL_POSTS = 25;
+
+        const fameLevels = { // Defined globally for access everywhere
+            UNKNOWN: { name: 'Unknown', threshold: 0, level: 0 },
+            UPCOMING: { name: 'Up-and-Coming', threshold: 100, level: 1 },
+            LOCAL_CELEB: { name: 'Local Celebrity', threshold: 1000, level: 2 },
+            RISING_STAR: { name: 'Rising Star', threshold: 10000, level: 3 },
+            NATIONAL_FAME: { name: 'National Fame', threshold: 100000, level: 4 },
+            GLOBAL_SUPERSTAR: { name: 'Global Superstar', threshold: 1000000, level: 5 },
+        };
+
+        // --- Initial Game State ---
+        function getDefaultGameState() {
+            // Use a function to ensure fresh state on new game
+            return {
+                player: {
+                    stageName: '',
+                    realName: '',
+                    age: 22,
+                    hometown: 'smallTown',
+                    primaryGenre: 'pop',
+                    secondaryGenre: 'none',
+                    style: 'polished',
+                    talent: 'charisma',
+                    avatar: DEFAULT_AVATAR,
+                    skills: { // Initialize all skills expected
+                        vocal: 50,
+                        songwriting: 50,
+                        production: 30,
+                        stage: 40,
+                        charisma: 10, // Added placeholder
+                        technical: 10, // Added placeholder
+                        marketing: 5,  // Added placeholder
+                        networking: 5   // Added placeholder
+                    },
+                    wellbeing: {
+                        energy: 80,
+                        mentalHealth: 70,
+                        publicImage: 60
+                    },
+                    stats: {
+                        subscribers: 0,
+                        streams: 0,
+                        income: 0,
+                        fame: fameLevels.UNKNOWN.name,
+                        fameLevelNumeric: fameLevels.UNKNOWN.level
+                    },
+                    catalogue: [],
+                    firstReleaseDone: false,
+                    overallQualityScore: 0
+                },
+                currentProject: null,
+                pendingRelease: null,
+                notifications: [],
+                upcomingEvents: [],
+                socialFeed: [],
+                growthInterval: null,
+                currentGrowthRate: 0.1, // Start low
+                activeListeners: 0,
+                milestonesReached: []
+            };
+        }
+        let gameState = getDefaultGameState(); // Initialize state
+
+        // --- DOM Elements (Cached) ---
+        // Character Creation
+        const characterCreation = document.getElementById('characterCreation');
+        const startGameBtn = document.getElementById('startGameBtn');
+        const avatarOptions = document.querySelectorAll('.avatar-option');
+        const avatarUpload = document.getElementById('avatarUpload');
+        const avatarPreview = document.getElementById('avatarPreview');
+        const stageNameInput = document.getElementById('stageName');
+        const realNameInput = document.getElementById('realName');
+        const startingAgeSelect = document.getElementById('startingAge');
+        const hometownSelect = document.getElementById('hometown');
+        const primaryGenreSelect = document.getElementById('primaryGenre');
+        const secondaryGenreSelect = document.getElementById('secondaryGenre');
+        const startingStyleSelect = document.getElementById('startingStyle');
+        const innateTalentSelect = document.getElementById('innateTalent');
+
+        // Main Game UI
+        const mainGame = document.getElementById('mainGame');
+        const playerAvatar = document.getElementById('playerAvatar');
+        const playerStageName = document.getElementById('playerStageName');
+        const playerGenre = document.getElementById('playerGenre');
+        const subscriberCount = document.getElementById('subscriberCount');
+        const streamCount = document.getElementById('streamCount');
+        const incomeCount = document.getElementById('incomeCount');
+        const fameLevel = document.getElementById('fameLevel');
+
+        // Skill Bars & Values
+        const vocalSkillBar = document.getElementById('vocalSkillBar'); const vocalSkillValue = document.getElementById('vocalSkillValue');
+        const songwritingSkillBar = document.getElementById('songwritingSkillBar'); const songwritingSkillValue = document.getElementById('songwritingSkillValue');
+        const productionSkillBar = document.getElementById('productionSkillBar'); const productionSkillValue = document.getElementById('productionSkillValue');
+        const stageSkillBar = document.getElementById('stageSkillBar'); const stageSkillValue = document.getElementById('stageSkillValue');
+
+        // Wellbeing Bars & Values
+        const energyBar = document.getElementById('energyBar'); const energyValue = document.getElementById('energyValue');
+        const mentalHealthBar = document.getElementById('mentalHealthBar'); const mentalHealthValue = document.getElementById('mentalHealthValue');
+        const publicImageBar = document.getElementById('publicImageBar'); const publicImageValue = document.getElementById('publicImageValue');
+
+        // Project Section
+        const noProject = document.getElementById('noProject');
+        const activeProject = document.getElementById('activeProject');
+        const projectTitle = document.getElementById('projectTitle');
+        const projectType = document.getElementById('projectType');
+        const projectStage = document.getElementById('projectStage');
+        const projectProgressBar = document.getElementById('projectProgressBar');
+        const projectProgressText = document.getElementById('projectProgressText');
+        const projectCoverPreview = document.getElementById('projectCoverPreview');
+        const startProjectBtn = document.getElementById('startProjectBtn');
+        const workOnProjectBtn = document.getElementById('workOnProjectBtn');
+        const cancelProjectBtn = document.getElementById('cancelProjectBtn');
+
+        // Project Modal
+        const projectModal = document.getElementById('projectModal');
+        const closeProjectModalBtn = document.getElementById('closeProjectModalBtn');
+        const coverArtUpload = document.getElementById('coverArtUpload');
+        const modalCoverPreview = document.getElementById('modalCoverPreview');
+        const projectTypeSelect = document.getElementById('projectTypeSelect');
+        const projectTitleInput = document.getElementById('projectTitleInput');
+        const projectGenreSelect = document.getElementById('projectGenreSelect');
+        const projectStyleSelect = document.getElementById('projectStyleSelect');
+        const confirmProjectBtn = document.getElementById('confirmProjectBtn');
+
+        // Release Modal
+        const releaseModal = document.getElementById('releaseModal');
+        const completedProjectTitle = document.getElementById('completedProjectTitle');
+        const releaseCoverArt = document.getElementById('releaseCoverArt');
+        const releaseTitle = document.getElementById('releaseTitle');
+        const releaseType = document.getElementById('releaseType');
+        const initialBuzz = document.getElementById('initialBuzz');
+        const potentialReach = document.getElementById('potentialReach');
+        const industryInterest = document.getElementById('industryInterest');
+        const confirmReleaseBtn = document.getElementById('confirmReleaseBtn');
+        const cancelReleaseBtn = document.getElementById('cancelReleaseBtn');
+
+        // Real-Time Stats Panel
+        const realTimeStatsPanel = document.getElementById('realTimeStatsPanel');
+        const rtStreams = document.getElementById('rtStreams');
+        const rtListeners = document.getElementById('rtListeners');
+        const rtSubscribers = document.getElementById('rtSubscribers');
+        const rtIncome = document.getElementById('rtIncome');
+        const rtGrowthRate = document.getElementById('rtGrowthRate');
+
+        // Quick Actions Buttons
+        const practiceVocalsBtn = document.getElementById('practiceVocalsBtn');
+        const writeSongBtn = document.getElementById('writeSongBtn');
+        const produceTrackBtn = document.getElementById('produceTrackBtn');
+        const restBtn = document.getElementById('restBtn');
+
+        // Catalogue Section
+        const catalogueSection = document.getElementById('catalogueSection');
+        const catalogueList = document.getElementById('catalogueList');
+
+        // Social Feed
+        const postUpdateBtn = document.getElementById('postUpdateBtn');
+        const refreshFeedBtn = document.getElementById('refreshFeedBtn');
+        const socialFeed = document.getElementById('socialFeed');
+
+        // Notifications
+        const clearNotificationsBtn = document.getElementById('clearNotificationsBtn');
+        const notificationsList = document.getElementById('notificationsList');
+
+        // Upcoming Events
+        const upcomingEvents = document.getElementById('upcomingEvents');
+
+         // --- Utility Functions ---
+
+        function handleFileUpload(event, previewElement, storageCallback) {
+             // Reset preview immediately if no file selected or selection cancelled
+            if (!event.target.files || event.target.files.length === 0) {
+                previewElement.src = previewElement === avatarPreview ? DEFAULT_AVATAR : DEFAULT_COVER_ART;
+                if (storageCallback) storageCallback(null); // Indicate no file chosen
+                return;
+            }
+
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageDataUrl = e.target.result;
+                    previewElement.src = imageDataUrl;
+                    if (storageCallback) {
+                        storageCallback(imageDataUrl);
+                    }
+                }
+                reader.onerror = function() {
+                    addNotification("Error reading file.", "warning");
+                    event.target.value = null;
+                    previewElement.src = previewElement === avatarPreview ? DEFAULT_AVATAR : DEFAULT_COVER_ART;
+                     if (storageCallback) storageCallback(null);
+                }
+                reader.readAsDataURL(file);
+            } else {
+                 addNotification("Invalid file type. Please select an image.", "warning");
+                 event.target.value = null; // Reset file input
+                 previewElement.src = previewElement === avatarPreview ? DEFAULT_AVATAR : DEFAULT_COVER_ART;
+                 if (storageCallback) storageCallback(null);
+            }
+        }
+
+        function handleAvatarUpload(event) {
+            handleFileUpload(event, avatarPreview, (imageDataUrl) => {
+                // Store only if valid image data is received
+                gameState.player.avatar = imageDataUrl || DEFAULT_AVATAR;
+                 // Deselect default options if custom is uploaded
+                 if (imageDataUrl) {
+                    avatarOptions.forEach(opt => opt.classList.remove('border-purple-500'));
+                 }
+            });
+        }
+
+        function handleCoverArtUpload(event) {
+            handleFileUpload(event, modalCoverPreview); // Just update preview in modal
+        }
+
+        function selectDefaultAvatar(option) {
+            avatarOptions.forEach(opt => opt.classList.remove('border-purple-500'));
+            option.classList.add('border-purple-500');
+            const url = option.dataset.avatarUrl;
+            gameState.player.avatar = url; // Store the selected default URL
+            avatarPreview.src = url; // Update the main preview
+            avatarUpload.value = null; // Clear file input if default is selected
+        }
+
+        function formatNumber(num, isCurrency = false) {
+            if (num === null || num === undefined || isNaN(num)) { // Check for invalid input
+                // console.warn(`formatNumber received invalid input: ${num}`);
+                return isCurrency ? '$NaN' : 'NaN';
+            }
+             const roundedNum = Math.round(num); // Always round first
+
+            let formatted = roundedNum.toString();
+            if (!isCurrency) {
+                 // Keep full number until 10k for better early game feel
+                if (roundedNum >= 1000000) {
+                    formatted = (roundedNum / 1000000).toFixed(1).replace('.0','') + 'M';
+                } else if (roundedNum >= 10000) { // Start K notation at 10k
+                    formatted = (roundedNum / 1000).toFixed(1).replace('.0','') + 'K';
+                } // else keep the full number below 10k
+            }
+             // Use localeString for currency commas, handle potential errors
+            try {
+                 return isCurrency ? '$' + roundedNum.toLocaleString() : formatted;
+            } catch (e) {
+                 console.error("Error formatting number with toLocaleString:", e);
+                 return isCurrency ? '$' + roundedNum : formatted; // Fallback
+            }
+        }
+
+         function capitalizeFirstLetter(string) {
+            return typeof string === 'string' && string.length > 0 ? string.charAt(0).toUpperCase() + string.slice(1) : '';
+        }
+
+        // --- Core Game Logic ---
+
+        function startGame() {
+            // Reset game state to default before applying new settings
+            gameState = getDefaultGameState();
+
+            // Get player input
+            gameState.player.stageName = stageNameInput.value.trim() || 'Unknown Artist';
+            gameState.player.realName = realNameInput.value.trim() || '';
+            gameState.player.age = parseInt(startingAgeSelect.value);
+            gameState.player.hometown = hometownSelect.value;
+            gameState.player.primaryGenre = primaryGenreSelect.value;
+            gameState.player.secondaryGenre = secondaryGenreSelect.value;
+            gameState.player.style = startingStyleSelect.value;
+            gameState.player.talent = innateTalentSelect.value;
+
+            // Check if a custom avatar was uploaded, otherwise use the selected default or a placeholder
+            if (!gameState.player.avatar || gameState.player.avatar === DEFAULT_AVATAR) {
+                 // If no default was explicitly selected either, pick a generic one
+                 const selectedDefault = document.querySelector('.avatar-option.border-purple-500');
+                 gameState.player.avatar = selectedDefault ? selectedDefault.dataset.avatarUrl : PLACEHOLDER_AVATAR_MALE;
+            }
+
+            // Apply talent bonus safely
+            const applyBonus = (skill, bonus) => {
+                if (typeof gameState.player.skills[skill] === 'number') {
+                    gameState.player.skills[skill] += bonus;
+                } else {
+                     console.warn(`Skill ${skill} not found for talent bonus.`);
+                     gameState.player.skills[skill] = bonus; // Initialize if missing
+                }
+            };
+            switch(gameState.player.talent) {
+                case 'charisma': applyBonus('charisma', 15); applyBonus('stage', 5); break; // Added charisma skill
+                case 'prodigy': applyBonus('vocal', 10); applyBonus('songwriting', 10); break;
+                case 'technical': applyBonus('technical', 15); applyBonus('production', 5); break; // Added technical skill
+                case 'lyricism': applyBonus('songwriting', 15); break;
+                case 'stage': applyBonus('stage', 15); break;
+            }
+            // Ensure skills don't exceed 100 and are whole numbers after bonus
+            for (const skill in gameState.player.skills) {
+                if (typeof gameState.player.skills[skill] === 'number') {
+                    gameState.player.skills[skill] = Math.min(100, Math.max(0, Math.round(gameState.player.skills[skill])));
+                } else {
+                     gameState.player.skills[skill] = 0; // Ensure all skills are numbers
+                }
+            }
+            // Ensure wellbeing starts as whole numbers
+            for (const key in gameState.player.wellbeing) {
+                 gameState.player.wellbeing[key] = Math.round(gameState.player.wellbeing[key]);
+            }
+
+            // Initialize UI
+            characterCreation.classList.add('hidden');
+            mainGame.classList.remove('hidden');
+
+            playerAvatar.src = gameState.player.avatar;
+            playerStageName.textContent = gameState.player.stageName;
+            playerGenre.textContent = `${capitalizeFirstLetter(gameState.player.primaryGenre)} Artist`;
+
+            // Initial setup data
+            gameState.notifications = [ { id: Date.now(), message: `Welcome ${gameState.player.stageName}! Time to make your mark.`, timestamp: 'Just now', type: 'info' } ];
+            gameState.upcomingEvents = [ { id: 1, title: 'Debut Release', description: 'Complete your first song to begin your journey', icon: 'calendar-day' } ];
+             gameState.socialFeed = [
+                { id: Date.now()+1, user: 'MusicFan92', avatar: PLACEHOLDER_AVATAR_FEMALE, time: 'Few hours ago', content: 'Looking for new artists! Drop your recommendations below! #NewMusic', likes: 12, comments: 3 },
+                { id: Date.now()+2, user: 'IndustryInsider', avatar: PLACEHOLDER_AVATAR_MALE, time: 'Earlier', content: 'The music scene is heating up with fresh talent this season. Who are you listening to?', likes: 45, comments: 8 }
+            ];
+            gameState.milestonesReached = []; // Reset milestones
+
+            // Stop any previous simulation interval if restarting game
+             if (gameState.growthInterval) {
+                clearInterval(gameState.growthInterval);
+                gameState.growthInterval = null;
+            }
+             realTimeStatsPanel.classList.add('hidden'); // Hide stats panel initially
+
+            updateAllUI();
+            renderCatalogue(); // Initial render (empty)
+        }
+
+        function openProjectModal() {
+             if (gameState.currentProject) {
+                addNotification("Finish or cancel your current project first!", "warning");
+                return;
+            }
+            projectTitleInput.value = ''; // Clear previous title
+            modalCoverPreview.src = DEFAULT_COVER_ART; // Reset preview
+            coverArtUpload.value = null; // Clear file input
+            projectModal.classList.remove('hidden');
+        }
+
+        function closeProjectModal() {
+            projectModal.classList.add('hidden');
+        }
+
+        function createProject() {
+            if (gameState.currentProject) {
+                addNotification("Finish or cancel your current project first!", "warning");
+                return;
+            }
+
+            const type = projectTypeSelect.value;
+            const title = projectTitleInput.value.trim() || `Untitled ${capitalizeFirstLetter(type)}`;
+            const genre = projectGenreSelect.value;
+            const style = projectStyleSelect.value;
+            // Use the actual preview source, which might be a data URL or the default
+            const coverArt = modalCoverPreview.src;
+
+            gameState.currentProject = {
+                id: Date.now(),
+                type: type,
+                title: title,
+                genre: genre,
+                style: style,
+                coverArt: coverArt,
+                progress: 0, // Initialize progress as number
+                quality: 0, // Initialize quality as number
+                stages: ['Writing', 'Recording', 'Production', 'Mixing', 'Mastering'],
+                currentStageIndex: 0
+            };
+
+            updateProjectUI(); // Update the active project display
+
+            closeProjectModal();
+            addNotification(`New project started: ${gameState.currentProject.title}`);
+        }
+
+        function workOnProject() {
+            if (!gameState.currentProject) {
+                console.error("Attempted to work on project when none exists.");
+                return;
+            }
+             if (gameState.player.wellbeing.energy < 5) {
+                addNotification('Too exhausted to work. Rest needed!', 'warning');
+                return;
+            }
+
+            const projectTitleForNotification = gameState.currentProject.title; // Store title before potential completion
+
+            // --- Input Validation & Defaulting ---
+            const currentEnergy = gameState.player.wellbeing.energy || 0;
+            const currentProgress = gameState.currentProject.progress || 0;
+            const currentQuality = gameState.currentProject.quality || 0;
+
+            // Determine skills and validate they are numbers
+            let primarySkillName, secondarySkillName;
+            const stage = gameState.currentProject.stages[gameState.currentProject.currentStageIndex];
+            switch(stage) {
+                case 'Writing': primarySkillName = 'songwriting'; secondarySkillName = 'vocal'; break;
+                case 'Recording': primarySkillName = 'vocal'; secondarySkillName = 'stage'; break;
+                case 'Production': primarySkillName = 'production'; secondarySkillName = 'technical'; break; // Use technical more
+                case 'Mixing': primarySkillName = 'production'; secondarySkillName = 'technical'; break;
+                case 'Mastering': primarySkillName = 'technical'; secondarySkillName = 'production'; break; // Technical lead for mastering
+                default: primarySkillName = 'songwriting'; secondarySkillName = 'production';
+            }
+            const primarySkillValue = gameState.player.skills[primarySkillName] || 0;
+            const secondarySkillValue = gameState.player.skills[secondarySkillName] || 0;
+
+             if (isNaN(primarySkillValue) || isNaN(secondarySkillValue)) {
+                 console.error(`Invalid skill values in workOnProject: Primary (${primarySkillName}: ${primarySkillValue}), Secondary (${secondarySkillName}: ${secondarySkillValue})`);
+                 addNotification("Error calculating progress due to invalid skill values.", "warning");
+                 return; // Stop if skills are invalid
+             }
+             if (isNaN(currentEnergy)) {
+                 console.error(`Invalid energy value in workOnProject: ${currentEnergy}`);
+                 addNotification("Error calculating progress due to invalid energy value.", "warning");
+                  gameState.player.wellbeing.energy = 50; // Reset energy to avoid loop
+                 return;
+             }
+
+            // --- Calculation ---
+            const skillFactor = (primarySkillValue * 0.7 + secondarySkillValue * 0.3) / 100;
+            const energyFactor = Math.max(0.1, currentEnergy / 100);
+            const randomFactor = (Math.random() * 0.5) + 0.75;
+
+            const progressIncreaseRaw = (5 + Math.random() * 10) * skillFactor * energyFactor * randomFactor;
+            const qualityIncreaseRaw = (0.5 + Math.random() * 1) * skillFactor * energyFactor * randomFactor;
+
+            // Ensure increases are numbers
+            const progressIncrease = isNaN(progressIncreaseRaw) ? 1 : Math.max(1, Math.round(progressIncreaseRaw));
+            const qualityIncrease = isNaN(qualityIncreaseRaw) ? 0.1 : Math.max(0.1, qualityIncreaseRaw);
+
+            if (isNaN(progressIncrease) || isNaN(qualityIncrease)) {
+                 console.error(`NaN detected during calculation in workOnProject: progressInc=${progressIncrease}, qualityInc=${qualityIncrease}`);
+                 addNotification("Calculation error occurred while working.", "warning");
+                 return; // Stop calculation if NaN occurs
+             }
+
+            // --- State Update ---
+            const newProgress = Math.min(100, currentProgress + progressIncrease);
+            const newQuality = currentQuality + qualityIncrease;
+
+             if (isNaN(newProgress) || isNaN(newQuality)) {
+                 console.error(`NaN detected before state update in workOnProject: newProgress=${newProgress}, newQuality=${newQuality}`);
+                 addNotification("State update error occurred while working.", "warning");
+                 return; // Stop state update if NaN occurs
+             }
+
+            gameState.currentProject.progress = newProgress;
+            gameState.currentProject.quality = newQuality;
+
+
+             // Only add notification if project still exists (not completed in this step)
+             if (gameState.currentProject.progress < 100) {
+                 addNotification(`Progress made on ${projectTitleForNotification}`);
+             }
+
+            // Advance stage if progress threshold met
+            const stageThreshold = 100 / gameState.currentProject.stages.length;
+             if (gameState.currentProject.progress >= (gameState.currentProject.currentStageIndex + 1) * stageThreshold && gameState.currentProject.currentStageIndex < gameState.currentProject.stages.length - 1) {
+                 gameState.currentProject.currentStageIndex++;
+                  // Ensure stage index is valid before accessing stages array
+                 if (gameState.currentProject.currentStageIndex < gameState.currentProject.stages.length) {
+                     addNotification(`Project "${projectTitleForNotification}" moved to ${gameState.currentProject.stages[gameState.currentProject.currentStageIndex]} stage.`);
+                 }
+             }
+
+            // Check if project is complete
+            if (gameState.currentProject.progress >= 100) {
+                 // Finalize Quality: Check for division by zero
+                 const avgProgress = progressIncrease > 0 ? progressIncrease : 5; // Use last increase or a default if it was 0
+                 const estimatedWorkSessions = 100 / avgProgress;
+                 const finalQuality = Math.min(100, Math.round(gameState.currentProject.quality / estimatedWorkSessions * 20));
+
+                 if (isNaN(finalQuality)) {
+                      console.error(`Calculated final quality is NaN. Quality before calc: ${gameState.currentProject.quality}, estimated sessions: ${estimatedWorkSessions}`);
+                      gameState.currentProject.quality = 50; // Fallback quality
+                 } else {
+                     gameState.currentProject.quality = finalQuality;
+                 }
+                prepareRelease(); // This will set currentProject to null
+            } else {
+                updateProjectUI(); // Update UI only if not completed
+            }
+
+            // Decrease wellbeing (safe updates)
+             const energyCost = Math.round(5 + Math.random() * 5);
+             gameState.player.wellbeing.energy = Math.max(0, Math.round(currentEnergy - energyCost));
+            if (Math.random() < 0.1) {
+                 const mentalCost = Math.round(1 + Math.random() * 2);
+                 gameState.player.wellbeing.mentalHealth = Math.max(0, Math.round((gameState.player.wellbeing.mentalHealth || 0) - mentalCost));
+            }
+            updateWellbeingBars();
+
+            // Small chance to increase relevant skills (safe updates)
+            const improveSkill = (skillName) => {
+                if (skillName && typeof gameState.player.skills[skillName] === 'number') {
+                     const gain = Math.round(0.5 + Math.random());
+                     gameState.player.skills[skillName] = Math.min(100, Math.round(gameState.player.skills[skillName] + gain));
+                }
+            };
+            if (Math.random() < 0.15) improveSkill(primarySkillName);
+            if (Math.random() < 0.10) improveSkill(secondarySkillName);
+            updateSkillBars();
+        }
+
+        function cancelProject() {
+            if (!gameState.currentProject) return;
+            const confirmCancel = confirm(`Are you sure you want to cancel "${gameState.currentProject.title}"? Progress will be lost.`);
+            if (confirmCancel) {
+                addNotification(`Project canceled: ${gameState.currentProject.title}`);
+                gameState.currentProject = null;
+                updateProjectUI();
+            }
+        }
+
+        function prepareRelease() {
+            if (!gameState.currentProject || gameState.currentProject.progress < 100) return;
+
+            gameState.pendingRelease = { ...gameState.currentProject };
+            gameState.currentProject = null;
+            updateProjectUI();
+
+            // Ensure quality is a number before proceeding
+            const finalQuality = Math.round(gameState.pendingRelease.quality || 50);
+            if (isNaN(finalQuality)) {
+                console.error("Pending release quality is NaN in prepareRelease. Resetting to 50.");
+                gameState.pendingRelease.quality = 50;
+            } else {
+                 gameState.pendingRelease.quality = finalQuality;
+            }
+
+            completedProjectTitle.textContent = gameState.pendingRelease.title;
+            releaseCoverArt.src = gameState.pendingRelease.coverArt;
+            releaseTitle.textContent = gameState.pendingRelease.title;
+            releaseType.textContent = capitalizeFirstLetter(gameState.pendingRelease.type);
+
+            // --- Safe Calculation of Estimated Metrics ---
+            const qualityScore = gameState.pendingRelease.quality; // Already validated
+            const fameFactor = (gameState.player.stats.fameLevelNumeric || 0) * 0.1 + 1;
+            const hypeFactor = ((gameState.player.wellbeing.publicImage || 0) / 100) * 0.5 + 0.5;
+            const randomFactor = 0.8 + Math.random() * 0.4;
+            const subFactor = Math.log10(Math.max(10, gameState.player.stats.subscribers || 0)) / 2; // Avoid log(0)
+
+            // Helper to calculate and clamp score
+            const calculateScore = (baseCalculation) => {
+                const score = Math.round(baseCalculation * randomFactor * fameFactor * subFactor * hypeFactor);
+                return Math.min(100, Math.max(0, isNaN(score) ? 0 : score)); // Clamp 0-100 and handle NaN
+            };
+
+            // Use validated skills from gameState
+            const skillStage = gameState.player.skills.stage || 0;
+            const skillCharisma = gameState.player.skills.charisma || 0;
+            const skillProd = gameState.player.skills.production || 0;
+            const skillMarket = gameState.player.skills.marketing || 0;
+            const skillWrite = gameState.player.skills.songwriting || 0;
+            const skillNetwork = gameState.player.skills.networking || 0;
+
+            const buzzScore = calculateScore(qualityScore * 0.5 + skillStage * 0.2 + skillCharisma * 0.1);
+            const reachScore = calculateScore(qualityScore * 0.6 + skillProd * 0.1 + skillMarket * 0.1);
+            const interestScore = calculateScore(qualityScore * 0.4 + skillWrite * 0.3 + skillNetwork * 0.1);
+
+            initialBuzz.textContent = getMetricDescription(buzzScore);
+            potentialReach.textContent = getMetricDescription(reachScore);
+            industryInterest.textContent = getMetricDescription(interestScore);
+
+            // Store validated scores
+            gameState.pendingRelease.buzzScore = buzzScore;
+            gameState.pendingRelease.reachScore = reachScore;
+            gameState.pendingRelease.interestScore = interestScore;
+
+            releaseModal.classList.remove('hidden');
+        }
+
+
+        function getMetricDescription(score) {
+             const roundedScore = Math.round(score || 0); // Default to 0 if score is invalid
+            if (roundedScore < 20) return 'Minimal';
+            if (roundedScore < 40) return 'Low';
+            if (roundedScore < 60) return 'Moderate';
+            if (roundedScore < 80) return 'High';
+            return 'Exceptional';
+        }
+
+        function releaseProject() {
+            if (!gameState.pendingRelease) return;
+
+            releaseModal.classList.add('hidden');
+
+            const releasedProject = { ...gameState.pendingRelease };
+            gameState.pendingRelease = null;
+
+            // Add to catalogue (ensure quality is number)
+            releasedProject.quality = Math.round(releasedProject.quality || 50);
+            gameState.player.catalogue.push({
+                id: releasedProject.id,
+                title: releasedProject.title,
+                type: releasedProject.type,
+                coverArt: releasedProject.coverArt,
+                quality: releasedProject.quality,
+                releaseDate: new Date().toLocaleDateString()
+            });
+            renderCatalogue();
+
+             // --- Safe Calculation of Initial Impact ---
+             const quality = releasedProject.quality || 0;
+             const reach = releasedProject.reachScore || 0;
+             const buzz = releasedProject.buzzScore || 0;
+             const fameLevel = gameState.player.stats.fameLevelNumeric || 0;
+
+             const baseImpact = quality * (reach + buzz) / 200; // 0-100 scale avg impact
+             const initialStreamsRaw = baseImpact * (50 + Math.random() * 100) * (1 + fameLevel * 0.1);
+             const initialSubscribersRaw = baseImpact * (buzz / 10) * (0.1 + Math.random() * 0.2) * (1 + fameLevel * 0.05);
+             const initialIncomeRaw = (isNaN(initialStreamsRaw) ? 0 : initialStreamsRaw) * (0.001 + Math.random() * 0.001);
+
+             const initialStreams = isNaN(initialStreamsRaw) ? 0 : Math.round(initialStreamsRaw);
+             const initialSubscribers = isNaN(initialSubscribersRaw) ? 0 : Math.round(initialSubscribersRaw);
+             const initialIncome = isNaN(initialIncomeRaw) ? 0 : initialIncomeRaw; // Keep income as float initially
+             const initialListeners = Math.round(initialStreams * (0.05 + Math.random()*0.05));
+
+
+            // Add initial impact to CUMULATIVE stats (safe update)
+            gameState.player.stats.streams = (gameState.player.stats.streams || 0) + initialStreams;
+            gameState.player.stats.subscribers = (gameState.player.stats.subscribers || 0) + initialSubscribers;
+            gameState.player.stats.income = (gameState.player.stats.income || 0) + initialIncome;
+            gameState.activeListeners = (gameState.activeListeners || 0) + initialListeners;
+
+
+            // Recalculate overall quality score safely
+            const totalQuality = gameState.player.catalogue.reduce((sum, item) => sum + (item.quality || 0), 0);
+            gameState.player.overallQualityScore = gameState.player.catalogue.length > 0
+                ? Math.round(totalQuality / gameState.player.catalogue.length)
+                : 0;
+
+            // Update overall growth rate safely
+            const qualityImpact = Math.max(0.5, (releasedProject.quality / 50));
+            const catalogueBonus = 1 + (gameState.player.catalogue.length / 20);
+            const fameBonus = 1 + (fameLevel / 10);
+            const overallQualityFactor = Math.max(0.1, (gameState.player.overallQualityScore || 10) / 50); // Avoid 0 quality score issue
+
+            const newGrowthRate = overallQualityFactor * qualityImpact * catalogueBonus * fameBonus;
+             gameState.currentGrowthRate = isNaN(newGrowthRate) ? 0.1 : Math.max(0.1, newGrowthRate); // Ensure valid rate
+
+            if (!gameState.player.firstReleaseDone) {
+                gameState.player.firstReleaseDone = true;
+                realTimeStatsPanel.classList.remove('hidden');
+                gameState.upcomingEvents = gameState.upcomingEvents.filter(e => e.id !== 1);
+                gameState.upcomingEvents.push({
+                    id: Date.now(), title: 'Fan Reactions Rolling In',
+                    description: `Initial response to ${releasedProject.title}`, icon: 'users'
+                 });
+                startRealTimeStats();
+            }
+
+            // Add industry interest effect
+            const interestScore = releasedProject.interestScore || 0;
+            if (interestScore > 70) addNotification("Industry professionals are taking notice!", "milestone");
+            else if (interestScore > 50) addNotification("Your release generated some buzz in the industry.", "info");
+
+            addNotification(`${releasedProject.title} released! Gained ${formatNumber(initialStreams)} streams & ${formatNumber(initialSubscribers)} subs initially.`, 'success');
+            updateAllUI();
+        }
+
+
+        function startRealTimeStats() {
+            if (gameState.growthInterval) {
+                clearInterval(gameState.growthInterval);
+            }
+
+            gameState.growthInterval = setInterval(() => {
+                 // --- Input Validation ---
+                 if (!gameState.player.firstReleaseDone) return;
+                 const currentRate = gameState.currentGrowthRate || 0; // Default to 0 if undefined/NaN
+                 const listeners = gameState.activeListeners || 0;
+                 const subs = gameState.player.stats.subscribers || 0;
+                 const qualityScore = gameState.player.overallQualityScore || 10; // Default quality > 0
+
+                  if (isNaN(currentRate) || isNaN(listeners) || isNaN(subs) || isNaN(qualityScore)) {
+                     console.error("NaN detected in realTimeStats inputs:", {currentRate, listeners, subs, qualityScore});
+                     // Attempt recovery or stop interval? For now, skip this tick.
+                     // You might want to reset some values here if they become persistently NaN.
+                     // clearInterval(gameState.growthInterval); // Option: Stop simulation on error
+                     return;
+                 }
+
+                // --- Calculation ---
+                 const baseGrowth = currentRate * Math.max(1, listeners * 0.1);
+                 const subBoost = 1 + (subs / 10000);
+                 const randomFluctuation = 0.8 + Math.random() * 0.4;
+
+                 const newStreamsRaw = baseGrowth * (10 + Math.random() * 20) * subBoost * randomFluctuation;
+                 const listenerGainRaw = baseGrowth * (0.5 + Math.random()) * subBoost * randomFluctuation * (qualityScore/50);
+                 const listenerDecay = Math.round(listeners * (0.01 + Math.random() * 0.02));
+                 const newListenersDeltaRaw = listenerGainRaw - listenerDecay;
+                 const newSubscribersRaw = baseGrowth * (0.005 + Math.random() * 0.01) * (qualityScore / 50) * randomFluctuation; // Slightly increased sub gain base
+                 const newIncomeRaw = (isNaN(newStreamsRaw) ? 0 : newStreamsRaw) * (0.001 + Math.random() * 0.001);
+
+
+                 // --- NaN Check Before State Update ---
+                 const newStreams = isNaN(newStreamsRaw) ? 0 : Math.round(newStreamsRaw);
+                 const newListenersDelta = isNaN(newListenersDeltaRaw) ? 0 : Math.round(newListenersDeltaRaw);
+                 const newSubscribers = isNaN(newSubscribersRaw) ? 0 : Math.round(newSubscribersRaw);
+                 const newIncome = isNaN(newIncomeRaw) ? 0 : newIncomeRaw; // Keep as float
+
+                 if (isNaN(newStreams) || isNaN(newListenersDelta) || isNaN(newSubscribers) || isNaN(newIncome)) {
+                     console.error("NaN detected in realTimeStats results:", {newStreams, newListenersDelta, newSubscribers, newIncome });
+                     return; // Skip update if calculations failed
+                 }
+
+
+                // --- State Update (Safe) ---
+                 gameState.player.stats.streams = (gameState.player.stats.streams || 0) + newStreams;
+                 gameState.player.stats.subscribers = Math.max(0, (gameState.player.stats.subscribers || 0) + newSubscribers);
+                 gameState.player.stats.income = (gameState.player.stats.income || 0) + newIncome;
+                 gameState.activeListeners = Math.max(0, (gameState.activeListeners || 0) + newListenersDelta);
+
+                 // --- UI Update ---
+                 updateStats();
+                 updateRealTimeStats();
+                 checkMilestones();
+
+            }, SIMULATION_INTERVAL);
+        }
+
+        function updateRealTimeStats() {
+             if (!gameState.player.firstReleaseDone) return;
+
+            rtStreams.textContent = formatNumber(gameState.player.stats.streams);
+            rtListeners.textContent = formatNumber(gameState.activeListeners);
+            rtSubscribers.textContent = formatNumber(gameState.player.stats.subscribers);
+            rtIncome.textContent = formatNumber(gameState.player.stats.income, true);
+
+            let growthDesc;
+             const rate = gameState.currentGrowthRate || 0;
+            if(rate < 0.5) growthDesc = 'Stagnant';
+            else if (rate < 1.5) growthDesc = 'Slow';
+            else if (rate < 3) growthDesc = 'Steady';
+            else if (rate < 5) growthDesc = 'Growing';
+            else growthDesc = 'Rapid';
+            rtGrowthRate.textContent = growthDesc;
+        }
+
+        function updateFameLevel() {
+            const subs = gameState.player.stats.subscribers || 0; // Default to 0 if undefined
+            let currentFame = fameLevels.UNKNOWN; // Default
+
+             // Find the highest level the player qualifies for
+             let foundLevel = fameLevels.UNKNOWN;
+             // Ensure fameLevels is iterated correctly (values, sorted by threshold)
+             Object.values(fameLevels).sort((a, b) => a.threshold - b.threshold).forEach(level => {
+                 if (subs >= level.threshold) {
+                     foundLevel = level;
+                 }
+             });
+             currentFame = foundLevel;
+
+
+            if (gameState.player.stats.fame !== currentFame.name) {
+                 if (gameState.player.stats.fame !== fameLevels.UNKNOWN.name) {
+                     addNotification(`Fame level increased to: ${currentFame.name}!`, 'milestone');
+                 }
+                gameState.player.stats.fame = currentFame.name;
+                gameState.player.stats.fameLevelNumeric = currentFame.level; // Store numeric level
+                fameLevel.textContent = currentFame.name;
+            }
+             // Ensure fameLevelNumeric is always a number, even if fame doesn't change
+             if (typeof gameState.player.stats.fameLevelNumeric !== 'number') {
+                  gameState.player.stats.fameLevelNumeric = currentFame.level;
+             }
+        }
+
+        function checkMilestones() {
+            updateFameLevel(); // Check fame level based on subs
+
+             const checkAndNotify = (key, threshold, message) => {
+                  const value = gameState.player.stats[key] || 0;
+                  if (!gameState.milestonesReached.includes(key + threshold) && value >= threshold) {
+                     addNotification(message, "milestone");
+                     gameState.milestonesReached.push(key + threshold);
+                 }
+             };
+
+             checkAndNotify('streams', 1000, "Reached 1,000 total streams!");
+             checkAndNotify('streams', 10000, "Reached 10,000 total streams!");
+             checkAndNotify('streams', 100000, "Reached 100,000 total streams!");
+             checkAndNotify('income', 1000, "Earned your first $1,000!");
+             checkAndNotify('income', 10000, "Earned over $10,000!");
+            // Add more milestones
+        }
+
+        function practiceSkill(skill) {
+             const currentEnergy = gameState.player.wellbeing.energy || 0;
+            if (currentEnergy < 10) {
+                addNotification('Too tired to practice. Get some rest.', 'warning');
+                return;
+            }
+             if (!gameState.player.skills || typeof gameState.player.skills[skill] !== 'number') {
+                 console.error(`Cannot practice invalid skill: ${skill}`);
+                 return;
+             }
+
+
+            // Increase skill safely
+             const skillIncrease = Math.round(1 + Math.random() * 2); // 1-3 points
+             gameState.player.skills[skill] = Math.min(100, Math.round(gameState.player.skills[skill] + skillIncrease));
+
+            // Decrease wellbeing safely
+             const energyCost = Math.round(8 + Math.random() * 4); // 8-12 energy cost
+             gameState.player.wellbeing.energy = Math.max(0, Math.round(currentEnergy - energyCost));
+            if (Math.random() < 0.15) {
+                 const mentalCost = Math.round(1 + Math.random() * 2);
+                 gameState.player.wellbeing.mentalHealth = Math.max(0, Math.round((gameState.player.wellbeing.mentalHealth || 0) - mentalCost));
+            }
+
+            updateSkillBars();
+            updateWellbeingBars();
+
+            addNotification(`${capitalizeFirstLetter(skill)} practiced. Skill improved!`);
+        }
+
+
+        function rest() {
+            // Increase energy and mental health safely
+            const energyGain = Math.round(20 + Math.random() * 15);
+            const mentalGain = Math.round(10 + Math.random() * 10);
+            gameState.player.wellbeing.energy = Math.min(100, Math.round((gameState.player.wellbeing.energy || 0) + energyGain));
+            gameState.player.wellbeing.mentalHealth = Math.min(100, Math.round((gameState.player.wellbeing.mentalHealth || 0) + mentalGain));
+
+            updateWellbeingBars();
+            addNotification('Rested. Energy and mental health restored.');
+        }
+
+
+        function postUpdate() {
+             if (!gameState.player.stageName) return; // Don't post if game not started
+
+            const messages = [ /* ... messages ... */ ]; // Keep messages array
+             const randomMessage = messages[Math.floor(Math.random() * messages.length)] || "Just posted an update!"; // Fallback message
+
+
+             addSocialFeedPost({
+                user: gameState.player.stageName,
+                avatar: gameState.player.avatar,
+                time: 'Just now',
+                content: randomMessage,
+                likes: 0, comments: 0, isPlayer: true
+            });
+
+            // Simulate engagement gain safely
+            if (gameState.player.firstReleaseDone && Math.random() < 0.4) {
+                 const qualityFactor = Math.max(0.1, (gameState.player.overallQualityScore || 10) / 50);
+                 const fameFactor = 1 + (gameState.player.stats.fameLevelNumeric || 0);
+                 const newSubsRaw = (Math.random() * 2) * qualityFactor * fameFactor;
+                 const newSubs = isNaN(newSubsRaw) ? 0 : Math.max(0, Math.round(newSubsRaw));
+
+                 if (newSubs > 0) {
+                     gameState.player.stats.subscribers = (gameState.player.stats.subscribers || 0) + newSubs;
+                     updateStats();
+                     updateRealTimeStats();
+                     addNotification(`Social post gained ${newSubs} new subscriber${newSubs !== 1 ? 's' : ''}!`, 'success');
+                 }
+                 // Increase public image safely
+                  const imageGain = Math.random() * 2;
+                  gameState.player.wellbeing.publicImage = Math.min(100, Math.round((gameState.player.wellbeing.publicImage || 0) + imageGain));
+                 updateWellbeingBars();
+            }
+        }
+
+
+        function refreshFeed() {
+            // Simulate new posts from others
+             const numNewPosts = Math.floor(Math.random() * 3);
+             for(let i=0; i<numNewPosts; i++) {
+                 if (Math.random() < 0.6) {
+                     const users = [ { name: 'MusicLover', avatar: PLACEHOLDER_AVATAR_FEMALE }, { name: 'IndieFan', avatar: PLACEHOLDER_AVATAR_MALE }, /* ... more users ... */ ];
+                     const randomUser = users[Math.floor(Math.random() * users.length)];
+                     const messages = [ `Can't stop listening to ${gameState.player.stageName || 'that new artist'}'s latest!` , /* ... more messages ... */ ];
+                      const randomMessage = messages[Math.floor(Math.random() * messages.length)] || "What's everyone listening to?";
+                     addSocialFeedPost({ user: randomUser.name, avatar: randomUser.avatar, time: 'A moment ago', content: randomMessage, likes: Math.floor(Math.random() * 30), comments: Math.floor(Math.random() * 8) });
+                 }
+             }
+            addNotification('Social feed refreshed');
+        }
+
+
+        function addSocialFeedPost(postData) {
+             // Basic validation
+             if (!postData || !postData.user || !postData.content) return;
+
+             gameState.socialFeed.unshift({ // Add to the beginning
+                id: Date.now() + Math.random(), // Avoid ID collision
+                 likes: postData.likes || 0,
+                 comments: postData.comments || 0,
+                 time: postData.time || 'Just now',
+                ...postData // Spread validated/defaulted data
+            });
+            // Limit feed length
+            while (gameState.socialFeed.length > MAX_SOCIAL_POSTS) {
+                gameState.socialFeed.pop();
+            }
+            renderSocialFeed();
+        }
+
+
+        function addNotification(message, type = 'info') {
+             if (!message) return; // Don't add empty notifications
+             const timestamp = new Date();
+             const timeString = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const notification = { id: Date.now() + Math.random(), message: message, type: type, timestamp: timeString };
+            gameState.notifications.unshift(notification); // Add to beginning
+             // Limit notifications
+            while (gameState.notifications.length > MAX_NOTIFICATIONS) {
+                gameState.notifications.pop();
+            }
+            renderNotifications();
+            showToast(message, type); // Show brief popup
+        }
+
+
+        function showToast(message, type) {
+             // (Implementation remains largely the same, ensure container exists)
+             const toastContainer = document.body;
+             if (!toastContainer) return; // Guard against body not being ready? (Unlikely)
+
+            const toast = document.createElement('div');
+            // Add fade-in class immediately
+            toast.className = `fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg text-white text-sm flex items-center z-[100] transition-opacity duration-300 ease-out opacity-0 ${type === 'success' ? 'bg-green-600' : type === 'warning' ? 'bg-yellow-600' : type === 'milestone' ? 'bg-purple-600' : 'bg-blue-600'}`;
+
+            let icon;
+            switch(type) { /* ... icon selection ... */
+                case 'success': icon = 'check-circle'; break;
+                case 'warning': icon = 'exclamation-triangle'; break;
+                case 'milestone': icon = 'trophy'; break;
+                default: icon = 'info-circle';
+            }
+
+            toast.innerHTML = `<i class="fas fa-${icon} mr-2"></i><span>${message}</span>`;
+            toastContainer.appendChild(toast);
+
+            // Force reflow THEN change opacity for fade-in
+            requestAnimationFrame(() => {
+                toast.style.opacity = '1';
+            });
+
+
+            // Fade out and remove
+            setTimeout(() => {
+                 if (toast.parentNode) { // Check if still attached
+                      toast.style.opacity = '0';
+                     setTimeout(() => {
+                         if (toast.parentNode) {
+                             toast.parentNode.removeChild(toast);
+                         }
+                     }, 500); // Wait for fade out transition
+                 }
+            }, 3000); // Start fading after 3 seconds
+        }
+
+        function clearNotifications() {
+            gameState.notifications = [];
+            renderNotifications();
+        }
+
+        // --- UI Rendering Functions ---
+
+         function renderCatalogue() {
+            catalogueList.innerHTML = '';
+             if (gameState.player.catalogue.length === 0) {
+                 catalogueList.innerHTML = '<p class="text-gray-500 italic">No releases yet. Complete your first project!</p>';
+                 return;
+             }
+             // Defensive coding: ensure catalogue exists and is an array
+             if (!Array.isArray(gameState.player.catalogue)) {
+                  console.error("Catalogue is not an array:", gameState.player.catalogue);
+                  gameState.player.catalogue = []; // Attempt recovery
+                  catalogueList.innerHTML = '<p class="text-red-500 italic">Error loading catalogue.</p>';
+                 return;
+             }
+
+            gameState.player.catalogue.slice().reverse().forEach(item => {
+                 // Check if item is valid before rendering
+                 if (!item || typeof item !== 'object' || !item.title) {
+                      console.warn("Skipping invalid catalogue item:", item);
+                      return;
+                 }
+                const catalogueItem = document.createElement('div');
+                catalogueItem.className = 'flex items-center space-x-3 bg-gray-700 p-2 rounded-lg fade-in';
+                catalogueItem.innerHTML = `
+                    <img src="${item.coverArt || DEFAULT_COVER_ART}" alt="${item.title} Cover" class="w-10 h-10 rounded object-cover bg-gray-600">
+                    <div class="flex-1 overflow-hidden">
+                        <p class="font-semibold text-sm truncate" title="${item.title}">${item.title}</p>
+                        <p class="text-xs text-gray-400">${capitalizeFirstLetter(item.type || 'N/A')} - R: ${item.releaseDate || 'Unknown'}</p>
+                    </div>
+                    <span class="text-xs font-medium bg-purple-600 px-2 py-0.5 rounded flex-shrink-0">Q: ${item.quality !== undefined && !isNaN(item.quality) ? item.quality : '??'}</span>
+                `;
+                catalogueList.appendChild(catalogueItem);
+            });
+        }
+
+        function renderSocialFeed() {
+             socialFeed.innerHTML = ''; // Clear feed
+             // Ensure feed exists and is an array
+              if (!Array.isArray(gameState.socialFeed)) {
+                  console.error("Social feed is not an array:", gameState.socialFeed);
+                  gameState.socialFeed = []; // Attempt recovery
+                 return;
+             }
+
+             gameState.socialFeed.forEach(post => {
+                 // Check post validity
+                 if (!post || typeof post !== 'object' || !post.user || !post.content) {
+                     console.warn("Skipping invalid social feed post:", post);
+                     return;
+                 }
+
+                const postElement = document.createElement('div');
+                postElement.className = 'bg-gray-700 rounded-lg p-3 fade-in mb-2';
+
+                 let avatarSrc = post.avatar || PLACEHOLDER_AVATAR_MALE; // Default avatar if missing
+                 if (post.isPlayer && gameState.player.avatar.startsWith('data:image')) {
+                     avatarSrc = gameState.player.avatar;
+                 } else if (!avatarSrc.includes('http') && !avatarSrc.startsWith('data:image')) {
+                     avatarSrc = PLACEHOLDER_AVATAR_MALE; // Fallback for invalid URLs
+                 }
+
+                postElement.innerHTML = `
+                    <div class="flex items-center space-x-3 mb-2">
+                        <img src="${avatarSrc}" class="w-8 h-8 rounded-full object-cover bg-gray-600">
+                        <div>
+                            <p class="font-semibold text-sm">${post.user}</p>
+                            <p class="text-xs text-gray-400">${post.time || 'Just now'}</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 text-sm mb-2 break-words">${post.content}</p>
+                    <div class="flex justify-start space-x-4 text-gray-400 text-xs">
+                        <span><i class="fas fa-heart mr-1"></i> ${post.likes || 0}</span>
+                        <span><i class="fas fa-comment mr-1"></i> ${post.comments || 0}</span>
+                        <span><i class="fas fa-share"></i></span>
+                    </div>
+                `;
+                socialFeed.appendChild(postElement);
+            });
+        }
+
+
+        function renderNotifications() {
+            notificationsList.innerHTML = '';
+             // Ensure notifications exist and is an array
+             if (!Array.isArray(gameState.notifications)) {
+                 console.error("Notifications is not an array:", gameState.notifications);
+                 gameState.notifications = []; // Attempt recovery
+                 return;
+             }
+             gameState.notifications.forEach(notification => {
+                 // Check notification validity
+                 if (!notification || typeof notification !== 'object' || !notification.message) {
+                     console.warn("Skipping invalid notification:", notification);
+                     return;
+                 }
+                const el = document.createElement('div');
+                 let borderColor = 'border-gray-700'; let textColor = 'text-gray-300';
+                 const type = notification.type || 'info';
+                 if (type === 'success') { borderColor = 'border-green-500'; textColor = 'text-green-300'; }
+                 else if (type === 'warning') { borderColor = 'border-yellow-500'; textColor = 'text-yellow-300'; }
+                 else if (type === 'milestone') { borderColor = 'border-purple-500'; textColor = 'text-purple-300'; }
+
+                el.className = `bg-gray-700 rounded-lg p-2 mb-2 border-l-4 ${borderColor} fade-in`;
+                el.innerHTML = `
+                    <p class="text-sm ${textColor} break-words">${notification.message}</p>
+                    <p class="text-xs text-gray-500 mt-1 text-right">${notification.timestamp || ''}</p>
+                `;
+                notificationsList.appendChild(el);
+            });
+        }
+
+
+        function renderUpcomingEvents() {
+            upcomingEvents.innerHTML = '';
+             if (!Array.isArray(gameState.upcomingEvents)) {
+                  console.error("UpcomingEvents is not an array:", gameState.upcomingEvents);
+                  gameState.upcomingEvents = [];
+                  upcomingEvents.innerHTML = '<p class="text-red-500 italic text-sm">Error loading events.</p>';
+                 return;
+             }
+             if (gameState.upcomingEvents.length === 0) {
+                 upcomingEvents.innerHTML = '<p class="text-gray-500 italic text-sm">Nothing scheduled right now.</p>';
+                 return;
+             }
+             gameState.upcomingEvents.forEach(event => {
+                  if (!event || typeof event !== 'object' || !event.title) {
+                     console.warn("Skipping invalid upcoming event:", event);
+                     return;
+                 }
+                const eventElement = document.createElement('div');
+                eventElement.className = 'bg-gray-700 rounded-lg p-3 fade-in mb-2';
+                eventElement.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <div class="bg-purple-500 rounded-full p-2 w-8 h-8 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-${event.icon || 'question'} text-white text-xs"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <p class="font-semibold text-sm truncate" title="${event.title}">${event.title}</p>
+                            <p class="text-xs text-gray-400 break-words">${event.description || ''}</p>
+                        </div>
+                    </div>
+                `;
+                upcomingEvents.appendChild(eventElement);
+            });
+        }
+
+
+        function updateAllUI() {
+            // Check if the main game screen is actually visible
+            // It might not be during initial load or if there was an error switching screens
+            if (!mainGame || mainGame.classList.contains('hidden')) {
+                // console.log("Skipping UI update, main game screen hidden.");
+                return;
+            }
+
+             try { // Wrap updates in try...catch for better error isolation
+                updateSkillBars();
+                updateWellbeingBars();
+                updateStats(); // Includes fame level update
+                renderSocialFeed();
+                renderNotifications();
+                renderUpcomingEvents();
+                updateProjectUI(); // Ensure project display is current
+                if (gameState.player.firstReleaseDone) {
+                     updateRealTimeStats(); // Update bottom panel if visible
+                }
+                 renderCatalogue(); // Update catalogue display
+             } catch (error) {
+                 console.error("Error during UI update:", error);
+                 // Maybe display a generic error message to the user?
+             }
+        }
+
+
+        function updateProjectUI() {
+             // Defensive checks
+             const project = gameState.currentProject;
+
+             if (project && typeof project === 'object') {
+                noProject.classList.add('hidden');
+                activeProject.classList.remove('hidden');
+                projectTitle.textContent = project.title || 'Untitled Project';
+                projectType.textContent = capitalizeFirstLetter(project.type || 'N/A');
+                projectCoverPreview.src = project.coverArt || DEFAULT_COVER_ART;
+
+                const progress = Math.round(project.progress || 0);
+                projectProgressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+                projectProgressText.textContent = `${progress}% complete`;
+
+                 // Ensure stage index is valid before accessing stages array
+                 const stageIndex = project.currentStageIndex;
+                 if(project.stages && stageIndex >= 0 && stageIndex < project.stages.length) {
+                     projectStage.textContent = project.stages[stageIndex];
+                 } else {
+                      // Handle invalid stage index or missing stages array
+                      projectStage.textContent = progress >= 100 ? 'Finished' : 'Unknown Stage';
+                 }
+            } else {
+                 // No valid current project
+                noProject.classList.remove('hidden');
+                activeProject.classList.add('hidden');
+                 // Optionally clear fields in the hidden activeProject div
+                 projectTitle.textContent = '';
+                 projectType.textContent = '';
+                 projectCoverPreview.src = DEFAULT_COVER_ART;
+                 projectProgressBar.style.width = '0%';
+                 projectProgressText.textContent = '0% complete';
+                 projectStage.textContent = '';
+            }
+        }
+
+        // Update Skill/Wellbeing/Stats functions use Math.round and formatNumber which handle NaN
+        function updateSkillBars() {
+            vocalSkillBar.style.width = `${gameState.player.skills.vocal}%`;
+            vocalSkillValue.textContent = `${Math.round(gameState.player.skills.vocal)}`;
+            songwritingSkillBar.style.width = `${gameState.player.skills.songwriting}%`;
+            songwritingSkillValue.textContent = `${Math.round(gameState.player.skills.songwriting)}`;
+            productionSkillBar.style.width = `${gameState.player.skills.production}%`;
+            productionSkillValue.textContent = `${Math.round(gameState.player.skills.production)}`;
+            stageSkillBar.style.width = `${gameState.player.skills.stage}%`;
+            stageSkillValue.textContent = `${Math.round(gameState.player.skills.stage)}`;
+        }
+
+        function updateWellbeingBars() {
+            energyBar.style.width = `${gameState.player.wellbeing.energy}%`;
+            energyValue.textContent = `${Math.round(gameState.player.wellbeing.energy)}`;
+            mentalHealthBar.style.width = `${gameState.player.wellbeing.mentalHealth}%`;
+            mentalHealthValue.textContent = `${Math.round(gameState.player.wellbeing.mentalHealth)}`;
+            publicImageBar.style.width = `${gameState.player.wellbeing.publicImage}%`;
+            publicImageValue.textContent = `${Math.round(gameState.player.wellbeing.publicImage)}`;
+        }
+
+        function updateStats() {
+            subscriberCount.textContent = formatNumber(gameState.player.stats.subscribers);
+            streamCount.textContent = formatNumber(gameState.player.stats.streams);
+            incomeCount.textContent = formatNumber(gameState.player.stats.income, true);
+            updateFameLevel(); // This updates the fame text content internally
+        }
+
+        // --- Event Listener Setup ---
+         function setupEventListeners() {
+            // Character Creation
+            startGameBtn?.addEventListener('click', startGame);
+            avatarUpload?.addEventListener('change', handleAvatarUpload);
+            avatarOptions.forEach(option => {
+                option.addEventListener('click', () => selectDefaultAvatar(option));
+            });
+
+            // Project Modal
+            startProjectBtn?.addEventListener('click', openProjectModal);
+            closeProjectModalBtn?.addEventListener('click', closeProjectModal);
+            coverArtUpload?.addEventListener('change', handleCoverArtUpload);
+            confirmProjectBtn?.addEventListener('click', createProject);
+
+            // Active Project
+            workOnProjectBtn?.addEventListener('click', workOnProject);
+            cancelProjectBtn?.addEventListener('click', cancelProject);
+
+            // Release Modal
+            confirmReleaseBtn?.addEventListener('click', releaseProject);
+            cancelReleaseBtn?.addEventListener('click', () => releaseModal.classList.add('hidden'));
+
+            // Quick Actions
+            practiceVocalsBtn?.addEventListener('click', () => practiceSkill('vocal'));
+            writeSongBtn?.addEventListener('click', () => practiceSkill('songwriting'));
+            produceTrackBtn?.addEventListener('click', () => practiceSkill('production'));
+            restBtn?.addEventListener('click', rest);
+
+            // Social/Notifications
+            postUpdateBtn?.addEventListener('click', postUpdate);
+            refreshFeedBtn?.addEventListener('click', refreshFeed);
+            clearNotificationsBtn?.addEventListener('click', clearNotifications);
+        }
+
+        // --- Initialize ---
+         // Wait for DOM to be fully loaded before setting up listeners
+         document.addEventListener('DOMContentLoaded', setupEventListeners);
+
+         // Optional: Auto-start game for testing (uncomment desired parts)
+        /*
+        document.addEventListener('DOMContentLoaded', () => {
+           characterCreation.classList.add('hidden');
+           mainGame.classList.remove('hidden');
+           // Set some default player data directly for testing
+           gameState = getDefaultGameState(); // Start with default
+           gameState.player.stageName = 'Debug Artist';
+           gameState.player.avatar = PLACEHOLDER_AVATAR_FEMALE;
+           gameState.player.primaryGenre = 'rock';
+           playerAvatar.src = gameState.player.avatar;
+           playerStageName.textContent = gameState.player.stageName;
+           playerGenre.textContent = `${capitalizeFirstLetter(gameState.player.primaryGenre)} Artist`;
+           gameState.notifications = [ { id: Date.now(), message: 'DEBUG MODE STARTED', timestamp: 'Just now', type: 'warning' } ];
+           gameState.upcomingEvents = [ { id: 1, title: 'Debug Release', description: 'Complete test song', icon: 'bug' } ];
+           gameState.socialFeed = [ { id: Date.now()+1, user: 'Debugger', avatar: PLACEHOLDER_AVATAR_MALE, time: '1 min ago', content: 'Debugging...', likes: 1, comments: 0 } ];
+           updateAllUI();
+           renderCatalogue();
+           setupEventListeners(); // Make sure listeners are set up even when skipping creation screen
+        });
+        */
+
+    </script>
+</body>
+</html>
